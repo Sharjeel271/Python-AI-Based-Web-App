@@ -17,20 +17,27 @@ def emotion_detector(text_to_analyse):
     # Used to track which emotion has the highest value
     dominant_emotion = ""
 
-    for emotion in emotions:
+    if response.status_code == 200:
+        for emotion in emotions:
+            # Finds the value of the emotion and stores it in a variable
+            emotion_value = formatted_response["emotionPredictions"][0]["emotion"][emotion]
 
-        # Finds the value of the emotion and stores it in a variable
-        emotion_value = formatted_response["emotionPredictions"][0]["emotion"][emotion]
+            # Adds emotion and its value to the dictionary
+            emotions_dictionary[emotion] = emotion_value
 
-        # Adds emotion and its value to the dictionary
-        emotions_dictionary[emotion] = emotion_value
+            # Checks if the dominant emotion is empty or if its value is less than the current emotion's value
+            if dominant_emotion == "" or emotions_dictionary[dominant_emotion] < emotion_value:
+                dominant_emotion = emotion
 
-        # Checks if the dominant emotion is empty or if its value is less than the current emotion's value
-        if dominant_emotion == "" or emotions_dictionary[dominant_emotion] < emotion_value:
-            dominant_emotion = emotion
+        # Adds another pair to the dictionary to indicate the dominant emotion
+        emotions_dictionary["dominant_emotion"] = dominant_emotion
 
-    # Adds another pair to the dictionary to indicate the dominant emotion
-    emotions_dictionary["dominant_emotion"] = dominant_emotion
+    elif response.status_code == 400:
+
+        for emotion in emotions:
+            emotions_dictionary[emotion] = None
+
+        emotions_dictionary["dominant_emotion"] = None
 
     return emotions_dictionary
 
